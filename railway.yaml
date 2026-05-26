@@ -1,0 +1,48 @@
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - 3001
+    envs:
+      - DATABASE_URL
+      - REDIS_URL
+      - OPENROUTER_API_KEY
+      - OPENROUTER_MODEL
+      - NODE_ENV
+      - PORT
+      - WEB_URL
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      - postgres
+      - redis
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    ports:
+      - 80
+    envs:
+      - VITE_API_URL
+
+  postgres:
+    image: postgres:15-alpine
+    envs:
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+
+volumes:
+  uploads:
+  postgres_data:
+  redis_data:
